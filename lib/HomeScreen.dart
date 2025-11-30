@@ -5,71 +5,125 @@ import 'StopwatchScreen.dart';
 import 'TemperatureConverterScreen.dart';
 import 'UnitConverterScreen.dart';
 import 'YouTubePlayerScreen.dart';
+import 'package:le_phuoc_long/screens/personal_screen.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedIndex = 0;
+
+  late final List<Widget> _tabs = [
+    const _DashboardView(),
+    TemperatureConverterScreen(),
+    const UnitConverterScreen(),
+    const PersonalScreen(),
+  ];
+
+  void _onItemTapped(int index) {
+    if (_selectedIndex == index) return;
+    setState(() => _selectedIndex = index);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: _tabs[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        backgroundColor: const Color(0xFF1C1845),
+        selectedItemColor: Colors.lightBlueAccent,
+        unselectedItemColor: Colors.white54,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.dashboard_customize),
+            label: 'Tiện ích',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.thermostat),
+            label: 'Nhiệt độ',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.swap_horiz),
+            label: 'Đơn vị',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Cá nhân',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _DashboardView extends StatelessWidget {
+  const _DashboardView();
 
   @override
   Widget build(BuildContext context) {
     final featureCards = _FeatureCardData.items;
-    return Scaffold(
-      backgroundColor: const Color(0xFF110C32),
-      body: Container(
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [Color(0xFF211C4A), Color(0xFF0B0824)],
-          ),
+    return Container(
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [Color(0xFF211C4A), Color(0xFF0B0824)],
         ),
-        child: SafeArea(
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildHeader(context),
-                const SizedBox(height: 32),
-                Wrap(
-                  spacing: 16,
-                  runSpacing: 16,
-                  children: featureCards
-                      .map(
-                        (data) => _FeatureCard(
-                          data: data,
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (_) => data.builder()),
-                          ),
+      ),
+      child: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.fromLTRB(24, 16, 24, 32),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(context),
+              const SizedBox(height: 32),
+              Wrap(
+                spacing: 16,
+                runSpacing: 16,
+                children: featureCards
+                    .map(
+                      (data) => _FeatureCard(
+                        data: data,
+                        onTap: () => Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => data.builder()),
                         ),
-                      )
-                      .toList(),
-                ),
-                const SizedBox(height: 32),
-                const Text(
-                  'Best Services',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 16),
-                _BestServiceCard(
-                  title: 'Website design & development',
-                  subtitle: 'Tối ưu hoá trải nghiệm chuyển đổi',
-                  price: 'Free Tools',
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const YouTubePlayerScreen(),
                       ),
-                    );
-                  },
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: 32),
+              const Text(
+                'Best Services',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
                 ),
-              ],
-            ),
+              ),
+              const SizedBox(height: 16),
+              _BestServiceCard(
+                title: 'Website design & development',
+                subtitle: 'Tối ưu hoá trải nghiệm chuyển đổi',
+                price: 'Free Tools',
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const YouTubePlayerScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
           ),
         ),
       ),
@@ -108,8 +162,8 @@ class HomeScreen extends StatelessWidget {
       ],
     );
   }
-
 }
+
 
 class _FeatureCardData {
   _FeatureCardData({
