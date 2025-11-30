@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
-    id("kotlin-android")
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
+    // The Flutter Gradle Plugin must be applied after the Android plugin.
     id("dev.flutter.flutter-gradle-plugin")
 }
 
@@ -16,13 +15,8 @@ android {
     }
     sourceSets {
         getByName("main") {
-            // Thay vì dùng .clear() và .add(), ta dùng hàm setSrcDirs() hoặc srcDirs()
-            // Dùng setSrcDirs để ghi đè danh sách thư mục nguồn Java, chỉ định thư mục Kotlin.
-            java.setSrcDirs(files("src/main/kotlin"))
+            java.setSrcDirs(files("src/main/java"))
         }
-    }
-    kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     defaultConfig {

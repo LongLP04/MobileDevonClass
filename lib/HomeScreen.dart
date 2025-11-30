@@ -73,7 +73,6 @@ class HomeScreen extends StatelessWidget {
           ),
         ),
       ),
-      bottomNavigationBar: _buildBottomBar(),
     );
   }
 
@@ -110,25 +109,6 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomBar() {
-    return Container(
-      margin: const EdgeInsets.fromLTRB(24, 0, 24, 24),
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-      decoration: BoxDecoration(
-        color: const Color(0xFF1C1845),
-        borderRadius: BorderRadius.circular(40),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: const [
-          _BottomIcon(icon: Icons.home_filled, isActive: true),
-          _BottomIcon(icon: Icons.widgets_outlined),
-          _BottomIcon(icon: Icons.favorite_border),
-          _BottomIcon(icon: Icons.person_outline),
-        ],
-      ),
-    );
-  }
 }
 
 class _FeatureCardData {
@@ -352,24 +332,3 @@ class _BestServiceCard extends StatelessWidget {
   }
 }
 
-class _BottomIcon extends StatelessWidget {
-  const _BottomIcon({required this.icon, this.isActive = false});
-
-  final IconData icon;
-  final bool isActive;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: isActive ? Colors.lightBlueAccent : Colors.transparent,
-        shape: BoxShape.circle,
-      ),
-      child: Icon(
-        icon,
-        color: isActive ? Colors.white : Colors.white54,
-      ),
-    );
-  }
-}
