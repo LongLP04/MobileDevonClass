@@ -5,7 +5,9 @@ import 'StopwatchScreen.dart';
 import 'TemperatureConverterScreen.dart';
 import 'UnitConverterScreen.dart';
 import 'YouTubePlayerScreen.dart';
+import 'package:le_phuoc_long/screens/group_info_screen.dart';
 import 'package:le_phuoc_long/screens/personal_screen.dart';
+import 'package:le_phuoc_long/screens/translator_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -22,6 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
     TemperatureConverterScreen(),
     const UnitConverterScreen(),
     const PersonalScreen(),
+    const GroupInfoScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -56,6 +59,10 @@ class _HomeScreenState extends State<HomeScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
             label: 'Cá nhân',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.groups_2),
+            label: 'Nhóm',
           ),
         ],
       ),
@@ -223,6 +230,14 @@ class _FeatureCardData {
       icon: Icons.ondemand_video,
       builder: () => const YouTubePlayerScreen(),
     ),
+    _FeatureCardData(
+      title: 'ML Kit dịch',
+      subtitle: 'Text • Voice • Ảnh',
+      rating: 5.0,
+      color: const Color(0xFF45B7D1),
+      icon: Icons.translate,
+      builder: () => const TranslatorScreen(),
+    ),
   ];
 }
 
@@ -245,11 +260,18 @@ class _FeatureCard extends StatelessWidget {
     const double spacing = 16;
 
     // TÍNH ĐỘ RỘNG KHẢ DỤNG: Lấy độ rộng màn hình trừ đi tổng padding
-    final availableWidth = screenWidth - horizontalPadding;
+    final double availableWidth =
+      (screenWidth - horizontalPadding).clamp(0.0, double.infinity).toDouble();
 
-    // TÍNH ĐỘ RỘNG MỖI THẺ: (Độ rộng khả dụng - khoảng cách) / 2
-    // Dòng này được sửa để đảm bảo không bị trừ lặp
-    final width = (availableWidth - spacing) / 2;
+    // Nếu màn hình quá hẹp (ví dụ đang trong chế độ chia đôi cửa sổ), chuyển về bố cục 1 cột.
+    final bool forceSingleColumn = availableWidth < 400;
+
+    // Bảo vệ khỏi giá trị âm, đồng thời vẫn ưu tiên bố cục hai cột khi còn đủ không gian.
+    final double width = forceSingleColumn
+      ? availableWidth
+      : ((availableWidth - spacing) / 2)
+        .clamp(0.0, availableWidth)
+        .toDouble();
 
     // LỖI XẢY RA KHI MÀN HÌNH QUÁ NHỎ HOẶC ĐỘ RỘNG CŨ LÀM CHO width ÂM.
     // Bây giờ, width đã được tính toán đúng dựa trên không gian bên trong Padding.
