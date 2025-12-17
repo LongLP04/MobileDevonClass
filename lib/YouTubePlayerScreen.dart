@@ -19,12 +19,17 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
   @override
   void initState() {
     super.initState();
-    _playerController = YoutubePlayerController(
+
+    // KHỞI TẠO CHUẨN – QUAN TRỌNG
+    _playerController = YoutubePlayerController.fromVideoId(
+      videoId: '',
+      autoPlay: false,
       params: const YoutubePlayerParams(
+        enableJavaScript: true,
         showFullscreenButton: true,
-        enableCaption: true,
-        loop: false,
+        playsInline: true,
         strictRelatedVideos: true,
+        loop: false,
       ),
     );
   }
@@ -39,23 +44,21 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
   void _loadVideo() {
     final rawUrl = _urlController.text.trim();
     if (rawUrl.isEmpty) {
-      setState(() {
-        _errorMessage = 'Vui lòng nhập đường dẫn YouTube.';
-      });
+      setState(() => _errorMessage = 'Vui lòng nhập đường dẫn YouTube.');
       return;
     }
 
-    final videoId = YoutubePlayerController.convertUrlToId(rawUrl);
+    final videoId = _extractVideoId(rawUrl);
     if (videoId == null) {
-      setState(() {
-        _errorMessage = 'Link không hợp lệ, vui lòng thử lại.';
-      });
+      setState(() => _errorMessage = 'Link không hợp lệ, vui lòng thử lại.');
       return;
     }
 
     setState(() {
       _errorMessage = null;
-      _playerController.loadVideoById(videoId: videoId);
+
+      // DÙNG cueVideoById để tránh lỗi 153
+      _playerController.cueVideoById(videoId: videoId);
     });
   }
 
@@ -93,9 +96,7 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
                                     icon: const Icon(Icons.clear, color: Colors.white70),
                                     onPressed: () {
                                       _urlController.clear();
-                                      setState(() {
-                                        _errorMessage = null;
-                                      });
+                                      setState(() => _errorMessage = null);
                                     },
                                   ),
                                 ),
@@ -139,5 +140,54 @@ class _YouTubePlayerScreenState extends State<YouTubePlayerScreen> {
         );
       },
     );
+  }
+
+  String? _extractVideoId(String input) {
+    final trimmed = input.trim();
+    if (trimmed.isEmpty) return null;
+
+    final idRegex = RegExp(r'^[a-zA-Z0-9_-]{11}$');
+    if (idRegex.hasMatch(trimmed)) return trimmed;
+
+    Uri? uri;
+    try {
+      uri = Uri.parse(trimmed);
+      if (!uri.hasScheme) {
+        uri = Uri.parse('https://$trimmed');
+      }
+    } catch (_) {
+      return null;
+    }
+
+    if (uri.host.isEmpty) return null;
+
+    String? candidate;
+
+    if (uri.host.contains('youtu.be')) {
+      candidate = uri.pathSegments.isNotEmpty ? uri.pathSegments.first : null;
+    } else if (uri.host.contains('youtube.com')) {
+      candidate = uri.queryParameters['v'];
+
+      final segments = uri.pathSegments;
+      if (candidate == null && segments.contains('embed')) {
+        candidate = segments[segments.indexOf('embed') + 1];
+      }
+
+      if (candidate == null && segments.contains('shorts')) {
+        candidate = segments[segments.indexOf('shorts') + 1];
+      }
+
+      if (candidate == null && segments.contains('live')) {
+        candidate = segments[segments.indexOf('live') + 1];
+      }
+    }
+
+    candidate ??= YoutubePlayerController.convertUrlToId(trimmed);
+
+    if (candidate != null && idRegex.hasMatch(candidate)) {
+      return candidate;
+    }
+
+    return null;
   }
 }

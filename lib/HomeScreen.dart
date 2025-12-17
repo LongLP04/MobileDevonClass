@@ -5,6 +5,7 @@ import 'StopwatchScreen.dart';
 import 'TemperatureConverterScreen.dart';
 import 'UnitConverterScreen.dart';
 import 'YouTubePlayerScreen.dart';
+import 'package:le_phuoc_long/screens/MarketScreen.dart';
 import 'package:le_phuoc_long/screens/group_info_screen.dart';
 import 'package:le_phuoc_long/screens/personal_screen.dart';
 import 'package:le_phuoc_long/screens/translator_screen.dart';
@@ -237,6 +238,14 @@ class _FeatureCardData {
       color: const Color(0xFF45B7D1),
       icon: Icons.translate,
       builder: () => const TranslatorScreen(),
+    ),
+    _FeatureCardData(
+      title: 'Market',
+      subtitle: 'Sản phẩm mới',
+      rating: 4.5,
+      color: const Color(0xFFFFB74D),
+      icon: Icons.storefront,
+      builder: () => const MarketScreen(),
     ),
   ];
 }
