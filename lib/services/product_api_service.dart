@@ -7,8 +7,9 @@ import '../models/productPost.dart';
 class ProductApiService {
   ProductApiService({http.Client? client}) : _client = client ?? http.Client();
 
+  // Đảm bảo URL này khớp với URL của API bạn đang chạy
   static const String _baseUrl =
-      'https://foundpurpleroof21.conveyor.cloud/api/ProductApi';
+      'https://fastaquaski68.conveyor.cloud/api/ProductApi';
 
   final http.Client _client;
 
@@ -26,17 +27,17 @@ class ProductApiService {
     });
   }
 
-  Future<List<productPost>> fetchProducts() async {
+  Future<List<ProductPost>> fetchProducts() async {
     final response = await _client.get(_buildUri());
     return _decodeList(response);
   }
 
-  Future<productPost> fetchProductById(int id) async {
+  Future<ProductPost> fetchProductById(int id) async {
     final response = await _client.get(_buildUri('$id'));
     return _decodeObject(response);
   }
 
-  Future<productPost> createProduct(productPost product) async {
+  Future<ProductPost> createProduct(ProductPost product) async {
     final response = await _client.post(
       _buildUri(),
       headers: _headers,
@@ -45,7 +46,7 @@ class ProductApiService {
     return _decodeObject(response);
   }
 
-  Future<productPost> updateProduct(int id, productPost product) async {
+  Future<ProductPost> updateProduct(int id, ProductPost product) async {
     final response = await _client.put(
       _buildUri('$id'),
       headers: _headers,
@@ -63,12 +64,13 @@ class ProductApiService {
     _ensureSuccess(response);
   }
 
-  Future<List<productPost>> searchProductsByName(String keyword) async {
+  // --- Logic Search được giữ nguyên ---
+  Future<List<ProductPost>> searchProductsByName(String keyword) async {
     final cleanKeyword = keyword.trim();
     if (cleanKeyword.isEmpty) return [];
 
     final lowerKeyword = cleanKeyword.toLowerCase();
-    final attempts = <Future<List<productPost>> Function()>[
+    final attempts = <Future<List<ProductPost>> Function()>[
       () => _attemptRemoteSearch(
             _buildUri('search', {'name': cleanKeyword}),
             lowerKeyword,
@@ -82,34 +84,30 @@ class ProductApiService {
     for (final attempt in attempts) {
       try {
         final results = await attempt();
-        if (results.isNotEmpty) {
-          return results;
-        }
-      } catch (_) {
-        // Try next strategy
-      }
+        if (results.isNotEmpty) return results;
+      } catch (_) {}
     }
 
     final fallback = await fetchProducts();
     return _filterByKeyword(fallback, lowerKeyword);
   }
 
-  List<productPost> _decodeList(http.Response response) {
+  List<ProductPost> _decodeList(http.Response response) {
     _ensureSuccess(response);
     final List<dynamic> data = json.decode(response.body) as List<dynamic>;
     return data
-        .map((item) => productPost.fromJson(item as Map<String, dynamic>))
+        .map((item) => ProductPost.fromJson(item as Map<String, dynamic>))
         .toList();
   }
 
-  productPost _decodeObject(http.Response response) {
+  ProductPost _decodeObject(http.Response response) {
     _ensureSuccess(response);
     final Map<String, dynamic> data =
         json.decode(response.body) as Map<String, dynamic>;
-    return productPost.fromJson(data);
+    return ProductPost.fromJson(data);
   }
 
-  Future<List<productPost>> _attemptRemoteSearch(
+  Future<List<ProductPost>> _attemptRemoteSearch(
     Uri uri,
     String lowerKeyword,
   ) async {
@@ -118,8 +116,8 @@ class ProductApiService {
     return _filterByKeyword(data, lowerKeyword);
   }
 
-  List<productPost> _filterByKeyword(
-    List<productPost> products,
+  List<ProductPost> _filterByKeyword(
+    List<ProductPost> products,
     String lowerKeyword,
   ) {
     if (lowerKeyword.isEmpty) return products;
